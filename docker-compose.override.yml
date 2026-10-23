@@ -1,0 +1,11 @@
+# Merged on top of upstream docker/docker-compose.quickstart.yml by bootstrap.sh.
+# Rebinds the published port to the Tailscale address only and passes agent credentials through.
+services:
+  paperclip:
+    restart: unless-stopped
+    ports: !override
+      - "${BIND_ADDRESS:?set BIND_ADDRESS to the VM's Tailscale IP}:${PAPERCLIP_PORT:-3100}:3100"
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY}
+      GH_TOKEN: ${GH_TOKEN:-}
+      PAPERCLIP_TELEMETRY_DISABLED: ${PAPERCLIP_TELEMETRY_DISABLED:-1}

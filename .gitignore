@@ -1,0 +1,6 @@
+.env
+upstream/
+data/
+backups/
+.paperclip-ref
+.paperclip-ref.prev
