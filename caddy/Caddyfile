@@ -1,12 +1,19 @@
 {$DOMAIN} {
 	encode zstd gzip
-	# Gate in front of Paperclip's own login: a fresh instance lets the FIRST signed-in user claim
-	# instance admin, so nobody reaches the app without this password. bootstrap.sh fills the hash.
-	basic_auth {
-		{$BASIC_AUTH_USER} __BASIC_AUTH_HASH__
+	# Unauthenticated liveness for uptime monitors (they count the gate's 401 as down). Answered by
+	# Caddy itself: it says nothing about Paperclip and proxies nothing.
+	handle /healthz {
+		respond "ok" 200
 	}
-	reverse_proxy 127.0.0.1:3100 {
-		flush_interval -1
+	handle {
+		# Gate in front of Paperclip's own login: a fresh instance lets the FIRST signed-in user claim
+		# instance admin, so nobody reaches the app without this password. bootstrap.sh fills the hash.
+		basic_auth {
+			{$BASIC_AUTH_USER} __BASIC_AUTH_HASH__
+		}
+		reverse_proxy 127.0.0.1:3100 {
+			flush_interval -1
+		}
 	}
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"

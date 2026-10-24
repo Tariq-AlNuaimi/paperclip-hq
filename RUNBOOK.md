@@ -56,4 +56,5 @@ immediately (first account = instance admin).
 - **Push rejected by `npm run ship` / review gate** — working as intended; the agent must fix and
   re-run, not bypass.
 - **UI unreachable** — `docker compose ... logs caddy` (cert issuance needs DNS + ports 80/443).
+- **Uptime monitor** — DigitalOcean checks `https://agents.ops-rihal.com/healthz` (Caddy answers it without the gate; the gated `/` returns 401, which monitors count as down).
 - **Rotate the gate password** — write a new bcrypt hash to `caddy/basic_auth.hash`, re-run `bootstrap.sh`.
