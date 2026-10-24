@@ -4,8 +4,8 @@ Self-hosted [Paperclip](https://github.com/paperclipai/paperclip) (MIT) — an o
 budgets and approvals for a team of **Claude Code** agents that work on our repos (starting with
 `fullstack-vibe-template` forks).
 
-This repo is a **deploy wrapper**, not a fork: it pins an upstream commit, runs Paperclip's own Docker
-image build, and serves it at **https://agents.ops-rihal.com** behind Caddy (HTTPS) with a password gate in
+This repo is a **deploy wrapper**, not a fork: it pins an upstream commit, runs that commit's prebuilt Paperclip
+image (plus Postgres), and serves it at **https://agents.ops-rihal.com** behind Caddy (HTTPS) with a password gate in
 front of Paperclip's own login.
 
 ```
@@ -14,9 +14,9 @@ paperclip-hq/
 ├── caddy/Caddyfile       # HTTPS + basic-auth gate (hash filled in at bootstrap)
 ├── docker-compose.override.yml  # app on loopback, Caddy public, exposure=public
 ├── infra/cloud-init.sh   # DigitalOcean first-boot script
-├── scripts/bootstrap.sh  # clone pinned upstream, build, start
+├── scripts/bootstrap.sh  # fetch pinned compose file, pull image, start
 ├── scripts/upgrade.sh    # move the pin, pull that image, keep data
-├── scripts/backup.sh     # tar the data dir (embedded Postgres, secrets key, workspaces)
+├── scripts/backup.sh     # tar data/ + pgdata/ (Postgres, secrets key, workspaces)
 ├── GUARDRAILS.md         # what agents may and may not do — read before giving them a repo
 └── RUNBOOK.md            # VM setup, first company, day-2 ops
 ```
