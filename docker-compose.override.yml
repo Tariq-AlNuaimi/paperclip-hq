@@ -36,7 +36,7 @@ services:
       retries: 20
 
   caddy:
-    image: mirror.gcr.io/library/caddy:2.10-alpine
+    image: mirror.gcr.io/library/caddy:2.11-alpine
     restart: unless-stopped
     network_mode: host # reach Paperclip on 127.0.0.1:3100
     environment:
