@@ -10,7 +10,7 @@ These rules keep a bad heartbeat cheap.
 | Spend | Anthropic console → dedicated workspace → Limits | Monthly cap, start at **$50** |
 | Repo reach | GitHub fine-grained PAT | Only listed repos; **Contents RW, Pull requests RW**; no Admin, no Workflows, no Secrets |
 | Merge | Each target repo → branch protection on `main` | Require a PR + 1 approval; agents' token can't approve its own PRs |
-| Network exposure | `BIND_ADDRESS` = Tailscale IP | `bootstrap.sh` refuses anything outside 100.x |
+| Network exposure | Caddy basic-auth gate + Paperclip login; app on 127.0.0.1 | `bootstrap.sh` refuses to start without the gate hash |
 
 ## Soft limits (set in Paperclip's UI)
 

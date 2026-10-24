@@ -4,3 +4,5 @@ data/
 backups/
 .paperclip-ref
 .paperclip-ref.prev
+caddy/basic_auth.hash
+caddy/Caddyfile.rendered

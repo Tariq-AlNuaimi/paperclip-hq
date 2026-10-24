@@ -5,10 +5,9 @@
 - Hetzner CX32 / DigitalOcean 4 GB (~$8–24/mo). Agents run builds (`next build`) inside the
   container — 4 GB RAM minimum, 8 GB if more than two agents run at once. Ubuntu 24.04.
 - Install Docker: `curl -fsSL https://get.docker.com | sh`
-- Install Tailscale: `curl -fsSL https://tailscale.com/install.sh | sh && sudo tailscale up --ssh`
-- Firewall: allow **nothing** inbound on the public interface (Tailscale SSH replaces port 22):
-  `sudo ufw default deny incoming && sudo ufw allow in on tailscale0 && sudo ufw enable`
-- `tailscale ip -4` → put it in `.env` as `BIND_ADDRESS`.
+- Firewall: inbound 22, 80, 443 only (DigitalOcean cloud firewall `paperclip-web`).
+- DNS: A record `agents.ops-rihal.com` → VM IP, Cloudflare proxy **off** (Caddy needs it for the cert).
+- On DigitalOcean this whole section is automated by `infra/cloud-init.sh`.
 
 ## 2. Credentials (one time)
 
@@ -23,8 +22,8 @@
 ./scripts/bootstrap.sh
 ```
 
-First build takes several minutes. Open `http://<tailscale-name>:3100` from your laptop/phone on the
-tailnet.
+First build takes ~25 minutes. Open https://agents.ops-rihal.com, pass the gate, and create your account
+immediately (first account = instance admin).
 
 ## 4. First company (in the UI)
 
@@ -55,5 +54,5 @@ tailnet.
   `git config --global credential.helper '!f() { echo username=x-access-token; echo password=$GH_TOKEN; }; f'`.
 - **Push rejected by `npm run ship` / review gate** — working as intended; the agent must fix and
   re-run, not bypass.
-- **UI unreachable** — is your device on the tailnet? `tailscale status`. The port is deliberately not
-  on the public IP.
+- **UI unreachable** — `docker compose ... logs caddy` (cert issuance needs DNS + ports 80/443).
+- **Rotate the gate password** — write a new bcrypt hash to `caddy/basic_auth.hash`, re-run `bootstrap.sh`.

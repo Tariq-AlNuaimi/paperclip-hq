@@ -1,11 +1,30 @@
 # Merged on top of upstream docker/docker-compose.quickstart.yml by bootstrap.sh.
-# Rebinds the published port to loopback or the Tailscale address only and passes agent credentials through.
+# Paperclip listens on loopback only; Caddy is the single public entry (HTTPS + password gate).
 services:
   paperclip:
     restart: unless-stopped
     ports: !override
-      - "${BIND_ADDRESS:?set BIND_ADDRESS (127.0.0.1 or the VM's Tailscale IP)}:${PAPERCLIP_PORT:-3100}:3100"
+      - "127.0.0.1:${PAPERCLIP_PORT:-3100}:3100"
     environment:
+      PAPERCLIP_DEPLOYMENT_EXPOSURE: public
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       GH_TOKEN: ${GH_TOKEN:-}
       PAPERCLIP_TELEMETRY_DISABLED: ${PAPERCLIP_TELEMETRY_DISABLED:-1}
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    network_mode: host # reach Paperclip on 127.0.0.1:3100
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN in .env}
+      BASIC_AUTH_USER: ${BASIC_AUTH_USER:-admin}
+    volumes:
+      - ../../caddy/Caddyfile.rendered:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - paperclip
+
+volumes:
+  caddy-data:
+  caddy-config:

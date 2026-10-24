@@ -5,12 +5,15 @@ budgets and approvals for a team of **Claude Code** agents that work on our repo
 `fullstack-vibe-template` forks).
 
 This repo is a **deploy wrapper**, not a fork: it pins an upstream commit, runs Paperclip's own Docker
-image build, and keeps it **private** — reachable only through an SSH tunnel (or Tailscale), never the public internet.
+image build, and serves it at **https://agents.ops-rihal.com** behind Caddy (HTTPS) with a password gate in
+front of Paperclip's own login.
 
 ```
 paperclip-hq/
 ├── .env.example          # pinned ref + API keys → copy to .env (never commit)
-├── docker-compose.override.yml  # binds to the Tailscale IP only, restart policy
+├── caddy/Caddyfile       # HTTPS + basic-auth gate (hash filled in at bootstrap)
+├── docker-compose.override.yml  # app on loopback, Caddy public, exposure=public
+├── infra/cloud-init.sh   # DigitalOcean first-boot script
 ├── scripts/bootstrap.sh  # clone pinned upstream, build, start
 ├── scripts/upgrade.sh    # move the pin, rebuild, keep data
 ├── scripts/backup.sh     # tar the data dir (embedded Postgres, secrets key, workspaces)
@@ -27,25 +30,25 @@ paperclip-hq/
 
 ## Access
 
-```bash
-ssh -L 3100:localhost:3100 root@<droplet-ip>   # then open http://localhost:3100
-```
+https://agents.ops-rihal.com → browser password prompt (gate) → Paperclip login.
+On a fresh instance the **first account created becomes instance admin**, which is why the gate exists.
 
 ## Quick start (on a fresh VM — see RUNBOOK)
 
 ```bash
 git clone git@github.com:Tariq-AlNuaimi/paperclip-hq.git && cd paperclip-hq
-cp .env.example .env    # API key, Tailscale IP + URL, two `openssl rand -hex 32` secrets
+cp .env.example .env    # DOMAIN, URL, API key, two `openssl rand -hex 32` secrets
+# put a bcrypt hash of the gate password in caddy/basic_auth.hash (see .env.example)
 ./scripts/bootstrap.sh
 ```
 
-Open `PAPERCLIP_PUBLIC_URL` from any device on your tailnet and create the admin account.
+Open `PAPERCLIP_PUBLIC_URL`, pass the gate, create the admin account.
 
 ## Decisions
 
 | Choice | Why |
 |---|---|
-| Authenticated mode **and** loopback/Tailscale-only | Upstream's Docker quickstart already requires login (`PAPERCLIP_DEPLOYMENT_MODE=authenticated`, private exposure). We add a network layer: whoever reaches this UI controls agents holding your API key and GitHub token, so the port never touches the public internet. |
+| Public URL, **two** locks | Paperclip runs `authenticated` + `public` (login required) and listens on loopback; Caddy adds HTTPS and a basic-auth gate. Whoever gets in controls agents holding your API key and GitHub token, and a fresh instance hands admin to the first sign-up. Upgrade path: Cloudflare Access (email OTP) once enabled on the account. |
 | Anthropic **API key** with a spend limit, not a Claude subscription login | Unattended automation; Paperclip's budget numbers then match a real bill you can cap in the Anthropic console. |
 | Pinned upstream commit | Upstream only publishes nightly/canary tags and moves fast; we upgrade deliberately. |
 | Fine-grained GitHub token, PRs only | Agents propose; humans merge. See GUARDRAILS.md. |

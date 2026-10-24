@@ -1,7 +1,7 @@
 #!/bin/bash
-# DigitalOcean user-data for a fresh Ubuntu 24.04 droplet. the provisioner appends this repo as
-# a base64 tarball (REPO_TARBALL). Secrets are generated HERE, on the droplet, so they never leave
-# it. The UI listens on 127.0.0.1 only: ssh -L 3100:localhost:3100 root@<droplet-ip>
+# DigitalOcean user-data for a fresh Ubuntu 24.04 droplet. The provisioner prepends this repo as a
+# base64 tarball (REPO_TARBALL), DOMAIN and BASIC_AUTH_HASH (a bcrypt hash; the password itself
+# never reaches the droplet). App secrets are generated HERE, so they never leave it.
 set -euo pipefail  # no -x: it would log the generated secrets
 exec > >(tee -a /var/log/paperclip-bootstrap.log) 2>&1
 
@@ -18,11 +18,13 @@ cd /opt/paperclip-hq
 
 if [[ ! -f .env ]]; then
   cp .env.example .env
+  sed -i "s|^DOMAIN=.*|DOMAIN=$DOMAIN|" .env
+  sed -i "s|^PAPERCLIP_PUBLIC_URL=.*|PAPERCLIP_PUBLIC_URL=https://$DOMAIN|" .env
   sed -i "s|^BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=$(openssl rand -hex 32)|" .env
   sed -i "s|^PAPERCLIP_TOOL_ACTION_SIGNING_SECRET=.*|PAPERCLIP_TOOL_ACTION_SIGNING_SECRET=$(openssl rand -hex 32)|" .env
-  sed -i "s|^PAPERCLIP_PUBLIC_URL=.*|PAPERCLIP_PUBLIC_URL=http://localhost:3100|" .env
 fi
-chmod 600 .env
+[[ -f caddy/basic_auth.hash ]] || printf '%s\n' "$BASIC_AUTH_HASH" > caddy/basic_auth.hash
+chmod 600 .env caddy/basic_auth.hash
 
 ./scripts/bootstrap.sh
 
