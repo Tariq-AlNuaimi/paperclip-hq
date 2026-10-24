@@ -18,7 +18,7 @@ paperclip-hq/
 ├── scripts/upgrade.sh    # move the pin, rebuild, keep data
 ├── scripts/backup.sh     # tar the data dir (embedded Postgres, secrets key, workspaces)
 ├── GUARDRAILS.md         # what agents may and may not do — read before giving them a repo
-└── RUNBOOK.md            # VM + Tailscale setup, first company, day-2 ops
+└── RUNBOOK.md            # VM setup, first company, day-2 ops
 ```
 
 ## What it does — and what it doesn't
