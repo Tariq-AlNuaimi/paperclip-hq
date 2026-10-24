@@ -23,8 +23,9 @@
 ./scripts/bootstrap.sh
 ```
 
-First start takes ~5 minutes (image pull). Open https://agents.ops-rihal.com, pass the gate, and create your account
-immediately (first account = instance admin).
+First start takes ~5 minutes (image pull). Then create the first admin: public mode disables claiming
+admin from the browser, so run `./scripts/admin-invite.sh` on the VM (DigitalOcean web console works),
+open the printed one-time link, pass the gate, and create your account.
 
 ## 4. First company (in the UI)
 

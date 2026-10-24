@@ -16,6 +16,7 @@ paperclip-hq/
 ├── infra/cloud-init.sh   # DigitalOcean first-boot script
 ├── scripts/bootstrap.sh  # fetch pinned compose file, pull image, start
 ├── scripts/upgrade.sh    # move the pin, pull that image, keep data
+├── scripts/admin-invite.sh  # print the one-time first-admin invite link
 ├── scripts/backup.sh     # tar data/ + pgdata/ (Postgres, secrets key, workspaces)
 ├── GUARDRAILS.md         # what agents may and may not do — read before giving them a repo
 └── RUNBOOK.md            # VM setup, first company, day-2 ops
@@ -31,7 +32,8 @@ paperclip-hq/
 ## Access
 
 https://agents.ops-rihal.com → browser password prompt (gate) → Paperclip login.
-On a fresh instance the **first account created becomes instance admin**, which is why the gate exists.
+The first admin is created from an invite link printed on the server (public mode disables browser
+self-promotion): `cd /opt/paperclip-hq && ./scripts/admin-invite.sh`, then open the link.
 
 ## Quick start (on a fresh VM — see RUNBOOK)
 
@@ -48,7 +50,7 @@ Open `PAPERCLIP_PUBLIC_URL`, pass the gate, create the admin account.
 
 | Choice | Why |
 |---|---|
-| Public URL, **two** locks | Paperclip runs `authenticated` + `public` (login required) and listens on loopback; Caddy adds HTTPS and a basic-auth gate. Whoever gets in controls agents holding your API key and GitHub token, and a fresh instance hands admin to the first sign-up. Upgrade path: Cloudflare Access (email OTP) once enabled on the account. |
+| Public URL, **two** locks | Paperclip runs `authenticated` + `public` (login required) and listens on loopback; Caddy adds HTTPS and a basic-auth gate. Whoever gets in controls agents holding your API key and GitHub token, so the login endpoints themselves sit behind the gate. Upgrade path: Cloudflare Access (email OTP) once enabled on the account. |
 | Anthropic **API key** with a spend limit, not a Claude subscription login | Unattended automation; Paperclip's budget numbers then match a real bill you can cap in the Anthropic console. |
 | Pinned upstream commit | Upstream only publishes nightly/canary tags and moves fast; we upgrade deliberately. |
 | Fine-grained GitHub token, PRs only | Agents propose; humans merge. See GUARDRAILS.md. |

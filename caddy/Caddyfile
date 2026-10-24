@@ -6,8 +6,8 @@
 		respond "ok" 200
 	}
 	handle {
-		# Gate in front of Paperclip's own login: a fresh instance lets the FIRST signed-in user claim
-		# instance admin, so nobody reaches the app without this password. bootstrap.sh fills the hash.
+		# Gate in front of Paperclip's own login: nobody reaches the app (or its sign-up and login
+		# endpoints) without this password. bootstrap.sh fills the hash.
 		basic_auth {
 			{$BASIC_AUTH_USER} __BASIC_AUTH_HASH__
 		}
