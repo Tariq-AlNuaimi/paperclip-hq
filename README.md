@@ -5,7 +5,7 @@ budgets and approvals for a team of **Claude Code** agents that work on our repo
 `fullstack-vibe-template` forks).
 
 This repo is a **deploy wrapper**, not a fork: it pins an upstream commit, runs Paperclip's own Docker
-image build, and keeps it **private** — reachable only over Tailscale, never the public internet.
+image build, and keeps it **private** — reachable only through an SSH tunnel (or Tailscale), never the public internet.
 
 ```
 paperclip-hq/
@@ -25,7 +25,13 @@ paperclip-hq/
 - **Doesn't:** drive claude.ai cloud sessions. Each agent is a Claude Code process inside the
   container, authenticated with `ANTHROPIC_API_KEY`, billed to that key.
 
-## Quick start (on the VM, after Tailscale is up — see RUNBOOK)
+## Access
+
+```bash
+ssh -L 3100:localhost:3100 root@<droplet-ip>   # then open http://localhost:3100
+```
+
+## Quick start (on a fresh VM — see RUNBOOK)
 
 ```bash
 git clone git@github.com:Tariq-AlNuaimi/paperclip-hq.git && cd paperclip-hq
@@ -39,7 +45,7 @@ Open `PAPERCLIP_PUBLIC_URL` from any device on your tailnet and create the admin
 
 | Choice | Why |
 |---|---|
-| Authenticated mode **and** Tailscale-only | Upstream's Docker quickstart already requires login (`PAPERCLIP_DEPLOYMENT_MODE=authenticated`, private exposure). We add a network layer: whoever reaches this UI controls agents holding your API key and GitHub token, so the port never touches the public internet. |
+| Authenticated mode **and** loopback/Tailscale-only | Upstream's Docker quickstart already requires login (`PAPERCLIP_DEPLOYMENT_MODE=authenticated`, private exposure). We add a network layer: whoever reaches this UI controls agents holding your API key and GitHub token, so the port never touches the public internet. |
 | Anthropic **API key** with a spend limit, not a Claude subscription login | Unattended automation; Paperclip's budget numbers then match a real bill you can cap in the Anthropic console. |
 | Pinned upstream commit | Upstream only publishes nightly/canary tags and moves fast; we upgrade deliberately. |
 | Fine-grained GitHub token, PRs only | Agents propose; humans merge. See GUARDRAILS.md. |

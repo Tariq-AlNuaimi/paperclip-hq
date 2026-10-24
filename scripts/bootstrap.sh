@@ -7,12 +7,14 @@ cd "$(dirname "$0")/.."
 [[ -f .env ]] || { echo "missing .env (cp .env.example .env)"; exit 1; }
 set -a; source .env; set +a
 
-for v in ANTHROPIC_API_KEY BETTER_AUTH_SECRET PAPERCLIP_TOOL_ACTION_SIGNING_SECRET PAPERCLIP_PUBLIC_URL; do
+for v in BETTER_AUTH_SECRET PAPERCLIP_TOOL_ACTION_SIGNING_SECRET PAPERCLIP_PUBLIC_URL; do
   [[ -n "${!v:-}" ]] || { echo "refusing to start: $v is empty in .env"; exit 1; }
 done
+[[ -n "${ANTHROPIC_API_KEY:-}" ]] || echo "WARNING: ANTHROPIC_API_KEY empty: UI runs but Claude Code agents cannot work until you set it and re-run bootstrap.sh"
 case "${BIND_ADDRESS:-}" in
-  100.*) ;; # Tailscale CGNAT range
-  *) echo "refusing to start: BIND_ADDRESS must be this VM's Tailscale IP (100.x.y.z), got '${BIND_ADDRESS:-}'"; exit 1 ;;
+  100.*) ;;      # Tailscale CGNAT range: reachable from your tailnet
+  127.0.0.1) ;;  # loopback: reach it with an SSH tunnel (ssh -L 3100:localhost:3100 root@<vm>)
+  *) echo "refusing to start: BIND_ADDRESS must be 127.0.0.1 or this VM's Tailscale IP (100.x.y.z), got '${BIND_ADDRESS:-}'"; exit 1 ;;
 esac
 
 if [[ ! -d upstream/.git ]]; then
