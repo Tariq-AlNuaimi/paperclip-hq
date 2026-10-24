@@ -12,7 +12,7 @@ services:
       PAPERCLIP_TELEMETRY_DISABLED: ${PAPERCLIP_TELEMETRY_DISABLED:-1}
 
   caddy:
-    image: caddy:2.10-alpine
+    image: caddy:2.11-alpine
     restart: unless-stopped
     network_mode: host # reach Paperclip on 127.0.0.1:3100
     environment:
