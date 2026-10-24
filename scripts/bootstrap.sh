@@ -11,7 +11,7 @@ for v in DOMAIN PAPERCLIP_PUBLIC_URL BETTER_AUTH_SECRET PAPERCLIP_TOOL_ACTION_SI
   [[ -n "${!v:-}" ]] || { echo "refusing to start: $v is empty in .env"; exit 1; }
 done
 [[ -s caddy/basic_auth.hash ]] || { echo "refusing to start: caddy/basic_auth.hash missing (see .env.example)"; exit 1; }
-[[ -n "${ANTHROPIC_API_KEY:-}" ]] || echo "WARNING: ANTHROPIC_API_KEY empty: UI runs but Claude Code agents cannot work until you set it and re-run bootstrap.sh"
+[[ -n "${ANTHROPIC_API_KEY:-}" ]] || echo "WARNING: ANTHROPIC_API_KEY empty: fine if you set it per agent in the Paperclip UI (adapter environment / secrets)"
 
 # bcrypt hashes contain '$', which compose would interpolate, so the hash goes into the Caddyfile
 # itself rather than through an env var.
