@@ -20,6 +20,7 @@ if [[ ! -f .env ]]; then
   cp .env.example .env
   sed -i "s|^DOMAIN=.*|DOMAIN=$DOMAIN|" .env
   sed -i "s|^PAPERCLIP_PUBLIC_URL=.*|PAPERCLIP_PUBLIC_URL=https://$DOMAIN|" .env
+  sed -i "s|^PAPERCLIP_DB_PASSWORD=.*|PAPERCLIP_DB_PASSWORD=$(openssl rand -hex 24)|" .env
   sed -i "s|^BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=$(openssl rand -hex 32)|" .env
   sed -i "s|^PAPERCLIP_TOOL_ACTION_SIGNING_SECRET=.*|PAPERCLIP_TOOL_ACTION_SIGNING_SECRET=$(openssl rand -hex 32)|" .env
 fi

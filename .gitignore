@@ -6,3 +6,4 @@ backups/
 .paperclip-ref.prev
 caddy/basic_auth.hash
 caddy/Caddyfile.rendered
+pgdata/

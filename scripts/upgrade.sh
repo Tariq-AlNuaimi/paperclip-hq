@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Usage: scripts/upgrade.sh <commit-sha>
-# Backs up ./data, moves the pin, rebuilds. Pause agents in the UI first.
+# Backs up ./data, moves the pin, pulls that commit's image. Pause agents in the UI first.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 new="${1:?usage: upgrade.sh <commit-sha>}"

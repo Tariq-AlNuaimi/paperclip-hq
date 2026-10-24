@@ -23,7 +23,7 @@
 ./scripts/bootstrap.sh
 ```
 
-First build takes ~25 minutes. Open https://agents.ops-rihal.com, pass the gate, and create your account
+First start takes ~5 minutes (image pull). Open https://agents.ops-rihal.com, pass the gate, and create your account
 immediately (first account = instance admin).
 
 ## 4. First company (in the UI)

@@ -15,7 +15,7 @@ paperclip-hq/
 ├── docker-compose.override.yml  # app on loopback, Caddy public, exposure=public
 ├── infra/cloud-init.sh   # DigitalOcean first-boot script
 ├── scripts/bootstrap.sh  # clone pinned upstream, build, start
-├── scripts/upgrade.sh    # move the pin, rebuild, keep data
+├── scripts/upgrade.sh    # move the pin, pull that image, keep data
 ├── scripts/backup.sh     # tar the data dir (embedded Postgres, secrets key, workspaces)
 ├── GUARDRAILS.md         # what agents may and may not do — read before giving them a repo
 └── RUNBOOK.md            # VM setup, first company, day-2 ops
